@@ -24,6 +24,7 @@ extern "C"
 #endif
 
 #include "LuaBridge.h"
+#include "luaecs.hpp"
 
 namespace PGEApp {
     static int MajorVersion = 0;
@@ -401,6 +402,9 @@ namespace PGEApp {
 
                 // init lua libs
                 InitModules();
+
+                // init luaecs
+                luaopen_ecs_core(L);
 
                 // load pge engine lua code
                 luaL_dostring(L, "require('_pge')");

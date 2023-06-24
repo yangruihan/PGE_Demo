@@ -101,7 +101,9 @@ include_directories(libs/olcPixelGameEngine)
 include_directories(libs/LuaBridge)
 
 aux_source_directory(. SRC_FILES)
+aux_source_directory(./libs/luaecs LUAECS_SRC_FILES)
 file(GLOB HEADERS "${PROJECT_SOURCE_DIR}/*.h")
+file(GLOB LUAECS_HEADERS "${PROJECT_SOURCE_DIR}/libs/luaecs/*.h")
 
 source_group("Headers" FILES ${HEADERS})
 
@@ -128,7 +130,9 @@ add_subdirectory(libs/lua)
 add_executable(
     ${PROJ_NAME}
     ${SRC_FILES}
+    ${LUAECS_SRC_FILES}
     ${HEADERS}
+    ${LUAECS_HEADERS}
 )
 
 if(APPLE)
@@ -161,14 +165,17 @@ endif()
 # Copy lua files
 if(WIN32)
 add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
+    COMMAND if $<CONFIG:Debug> neq 0 ("${CMAKE_COMMAND}" -E copy "${PROJ_SOURCE_ROOT}/libs/luaecs/ecs.lua" "${EXECUTABLE_OUTPUT_PATH}/Debug/ecs.lua")
     COMMAND if $<CONFIG:Debug> neq 0 ("${CMAKE_COMMAND}" -E copy "${PROJ_SOURCE_ROOT}/_pge.lua" "${EXECUTABLE_OUTPUT_PATH}/Debug/_pge.lua")
     COMMAND if $<CONFIG:Debug> neq 0 ("${CMAKE_COMMAND}" -E copy "${PROJ_SOURCE_ROOT}/game.lua" "${EXECUTABLE_OUTPUT_PATH}/Debug/game.lua")
 
+    COMMAND if $<CONFIG:Release> neq 0 ("${CMAKE_COMMAND}" -E copy "${PROJ_SOURCE_ROOT}/libs/luaecs/ecs.lua" "${EXECUTABLE_OUTPUT_PATH}/Release/ecs.lua")
     COMMAND if $<CONFIG:Release> neq 0 ("${CMAKE_COMMAND}" -E copy "${PROJ_SOURCE_ROOT}/_pge.lua" "${EXECUTABLE_OUTPUT_PATH}/Release/_pge.lua")
     COMMAND if $<CONFIG:Release> neq 0 ("${CMAKE_COMMAND}" -E copy "${PROJ_SOURCE_ROOT}/game.lua" "${EXECUTABLE_OUTPUT_PATH}/Release/game.lua")
 )
 else()
 add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${PROJ_SOURCE_ROOT}/libs/luaecs/ecs.lua" "${EXECUTABLE_OUTPUT_PATH}/ecs.lua"
     COMMAND ${CMAKE_COMMAND} -E copy "${PROJ_SOURCE_ROOT}/_pge.lua" "${EXECUTABLE_OUTPUT_PATH}/_pge.lua"
     COMMAND ${CMAKE_COMMAND} -E copy "${PROJ_SOURCE_ROOT}/game.lua" "${EXECUTABLE_OUTPUT_PATH}/game.lua"
 )

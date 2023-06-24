@@ -1,0 +1,3 @@
+[submodule "libs/luaecs"]
+	path = libs/luaecs
+	url = https://github.com/yangruihan/luaecs.git
