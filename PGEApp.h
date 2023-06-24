@@ -151,7 +151,10 @@ namespace PGEApp {
                 sAppName = "App";
 
                 L = luaL_newstate();
-                InitLua();
+                bool ret = InitLua();
+                if (!ret) {
+                    throw std::runtime_error("Init Lua Error!");
+                }
             }
 
             virtual ~App() {
@@ -364,11 +367,25 @@ namespace PGEApp {
                 return true;
             }
 
+            bool InitECSModule() {
+                luaL_requiref(L, "ecs.core", luaopen_ecs_core, 1);
+                lua_pop(L, 1);
+
+                luabridge::getGlobalNamespace(L)
+                    .beginNamespace(PGELuaTableName)
+                    .beginNamespace("ecs")
+                    .endNamespace()
+                    .endNamespace();
+
+                return true;
+            }
+           
             bool InitModules() {
                 InitTimerModule();
                 InitWindowModule();
                 InitGraphicsModule();
                 InitInputModule();
+                InitECSModule();
                 return true;
             }
 
@@ -403,14 +420,19 @@ namespace PGEApp {
                 // init lua libs
                 InitModules();
 
-                // init luaecs
-                luaopen_ecs_core(L);
-
                 // load pge engine lua code
-                luaL_dostring(L, "require('_pge')");
+                int ret = luaL_dostring(L, "require('_pge')");
+                if (ret != LUA_OK) {
+                    std::cout << "Error loading _pge.lua: " << lua_tostring(L, -1) << std::endl;
+                    return false;
+                }
 
                 // require gameplay code
-                luaL_dostring(L, "require('game')");
+                ret = luaL_dostring(L, "require('game')");
+                if (ret != LUA_OK) {
+                    std::cout << "Error loading game.lua: " << lua_tostring(L, -1) << std::endl;
+                    return false;
+                }
 
                 InitConfig();
 

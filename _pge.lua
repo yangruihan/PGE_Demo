@@ -30,4 +30,4 @@ function _pge_on_destroy()
     end
 end
 
-ecs = require("ecs")
+PGE.ecs = require("ecs")
