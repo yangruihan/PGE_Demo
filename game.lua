@@ -43,18 +43,39 @@ world:register{
 
 local sprites = {}
 local tut_tile_idx = 0
-local tut_wall_idx = 1
+
+local function init_tiles()
+    for y = 1, 30 do
+        for x = 1, 24 do
+            local idx2 = -1
+
+            if x == 1 or y == 1 or x == 24 then
+                idx2 = 0
+            end
+
+            if x > 3 and x <= 21 and y > 4 and y <= 6 then
+                idx2 = 1
+            elseif x > 3 and x <= 21 and y > 6 and y <= 8 then
+                idx2 = 2
+            elseif x > 3 and x <= 21 and y > 8 and y <= 10 then
+                idx2 = 3
+            end
+
+            if idx2 >= 0 then
+                world:new{
+                    pos = {x = x * block_size.w, y = y * block_size.h},
+                    sprite = {idx = tut_tile_idx, idx2 = idx2},
+                    type = idx2 == 0 and type_wall or type_tile,
+                }
+            end
+        end
+    end
+end
 
 function load()
     sprites[tut_tile_idx] = graphics.load_sprite("./assets/tut_tiles.png")
-    sprites[tut_wall_idx] = graphics.load_sprite("./assets/tut_tile.png")
 
-    -- init tiles
-    world:new{
-        pos = {x = 0, y = 0},
-        sprite = {idx = tut_tile_idx, idx2 = 0},
-    }
-
+    init_tiles()
 end
 
 local function draw_system(dt)
