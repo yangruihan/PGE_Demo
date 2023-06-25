@@ -22,8 +22,32 @@ world:register{
 }
 
 world:register{
+    name = "velocity",
+    "x:float",
+    "y:float",
+}
+
+world:register{
+    name = "color",
+    "r:byte",
+    "g:byte",
+    "b:byte",
+    "a:byte",
+}
+
+world:register{
     name = "g_circle",
     "radius:float",
+}
+
+world:register{
+    name = "g_rect",
+    "w:float",
+    "h:float",
+}
+
+world:register{
+    name = "g_fill",
 }
 
 world:register{
@@ -70,6 +94,14 @@ local function init_tiles()
             end
         end
     end
+
+    world:new{
+        pos = {x = 0, y = 0},
+        g_circle = {radius = 10},
+        color = {r = 255, g = 0, b = 0, a = 255},
+        g_fill = true,
+        velocity = {x = 10, y = 10},
+    }
 end
 
 function load()
@@ -82,6 +114,7 @@ local function draw_system(dt)
     graphics.clear(0, 0, 128)
     graphics.set_pixel_mode(graphics.PixelMode.Mask)
 
+    -- draw sprite
     for e in world:select"pos:in sprite:in" do
         graphics.draw_partial_sprite(
             e.pos.x,
@@ -93,8 +126,68 @@ local function draw_system(dt)
             block_size.h
         )
     end
+
+    -- draw circle
+    for e in world:select"pos:in g_circle:in color:in g_fill" do
+        graphics.fill_circle(
+            e.pos.x,
+            e.pos.y,
+            e.g_circle.radius,
+            e.color.r,
+            e.color.g,
+            e.color.b,
+            e.color.a
+        )
+    end
+
+    for e in world:select"pos:in g_circle:in color:in" do
+        graphics.draw_circle(
+            e.pos.x,
+            e.pos.y,
+            e.g_circle.radius,
+            e.color.r,
+            e.color.g,
+            e.color.b,
+            e.color.a
+        )
+    end
+
+    -- draw rect
+    for e in world:select"pos:in g_rect:in color:in g_fill" do
+        graphics.fill_rect(
+            e.pos.x,
+            e.pos.y,
+            e.g_rect.w,
+            e.g_rect.h,
+            e.color.r,
+            e.color.g,
+            e.color.b,
+            e.color.a
+        )
+    end
+
+    for e in world:select"pos:in g_rect:in color:in" do
+        graphics.draw_rect(
+            e.pos.x,
+            e.pos.y,
+            e.g_rect.w,
+            e.g_rect.h,
+            e.color.r,
+            e.color.g,
+            e.color.b,
+            e.color.a
+        )
+    end
+end
+
+local function move_system(dt)
+    for e in world:select"pos:update velocity:in" do
+        e.pos.x = e.pos.x + e.velocity.x * dt
+        e.pos.y = e.pos.y + e.velocity.y * dt
+    end
 end
 
 function update(dt)
+    move_system(dt)
     draw_system(dt)
 end
