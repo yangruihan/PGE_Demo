@@ -100,7 +100,15 @@ local function init_tiles()
         g_circle = {radius = 10},
         color = {r = 255, g = 0, b = 0, a = 255},
         g_fill = true,
-        velocity = {x = 10, y = 10},
+        velocity = {x = 20, y = 20},
+    }
+
+    world:new{
+        pos = { x =  12 * block_size.w, y = 25 * block_size.h },
+        g_rect = { w = 2 * block_size.w, h = block_size.h },
+        color = { r = 255, g = 255, b = 255, a = 255 },
+        g_fill = true,
+        type = type_player,
     }
 end
 
@@ -187,7 +195,25 @@ local function move_system(dt)
     end
 end
 
+local function input_system(dt)
+end
+
+local FIXED_TARGET_FRAME = 60
+local fixed_delta_time = 1 / FIXED_TARGET_FRAME
+local fixed_accumulator = 0
+
+local function fixed_update()
+    move_system(fixed_delta_time)
+end
+
 function update(dt)
-    move_system(dt)
+    fixed_accumulator = fixed_accumulator + dt
+    while fixed_accumulator >= fixed_delta_time do
+        fixed_update()
+        fixed_accumulator = fixed_accumulator - fixed_delta_time
+    end
+
     draw_system(dt)
+
+    world:update()
 end
