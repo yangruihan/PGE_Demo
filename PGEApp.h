@@ -158,8 +158,7 @@ namespace PGEApp {
             }
 
             virtual ~App() {
-                lua_close(L);
-                L = nullptr;
+                FreeLua();
             }
 
         public:
@@ -169,6 +168,19 @@ namespace PGEApp {
             }
 
             bool OnUserUpdate(float fElapsedTime) override {
+                if (EnableHotReload && GetKey(olc::Key::F5).bReleased) {
+                    OnUserDestroy();
+
+                    FreeLua();
+                    L = luaL_newstate();
+                    bool ret = InitLua();
+                    if (!ret) {
+                        throw std::runtime_error("Init Lua Error!");
+                    }
+
+                    OnUserCreate();
+                }
+
                 DeltaTime = fElapsedTime;
                 CallLuaFunc(L, "_pge_update");
 
@@ -405,6 +417,8 @@ namespace PGEApp {
                 ScreenXScale = (int) config["screen_x_scale"];
                 ScreenYScale = (int) config["screen_y_scale"];
 
+                EnableHotReload = (bool) config["enable_hotreload"];
+
                 return true;
             }
 
@@ -439,6 +453,12 @@ namespace PGEApp {
                 return true;
             }
 
+            bool FreeLua() {
+                lua_close(L);
+                L = nullptr;
+                return true;
+            }
+
         private:
             lua_State *L;
 
@@ -448,6 +468,8 @@ namespace PGEApp {
             int ScreenHeight = 200;
             int ScreenXScale = 2;
             int ScreenYScale = 2;
+            
+            bool EnableHotReload = false;
         };
 
         static App *instance = nullptr;

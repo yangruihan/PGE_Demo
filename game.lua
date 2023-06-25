@@ -4,11 +4,13 @@ function config()
         screen_width = 512,
         screen_height = 480,
         screen_x_scale = 1,
-        screen_y_scale = 1
+        screen_y_scale = 1,
+        enable_hotreload = true,
     }
 end
 
 local block_size = {w = 16, h = 16}
+local player_size = {w = 16, h = 4}
 
 local graphics = PGE.graphics
 local input = PGE.input
@@ -105,9 +107,8 @@ local function init_tiles()
 
     world:new{
         pos = { x =  12 * block_size.w, y = 25 * block_size.h },
-        g_rect = { w = 2 * block_size.w, h = block_size.h },
+        g_rect = { w = player_size.w, h = player_size.h },
         color = { r = 255, g = 255, b = 255, a = 255 },
-        g_fill = true,
         type = type_player,
     }
 end
