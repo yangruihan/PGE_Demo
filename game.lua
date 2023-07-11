@@ -10,7 +10,7 @@ function config()
 end
 
 local block_size = {w = 16, h = 16}
-local player_size = {w = 16, h = 4}
+local player_size = {w = 24, h = 4}
 
 local graphics = PGE.graphics
 local input = PGE.input
@@ -96,7 +96,10 @@ local function init_tiles()
             end
         end
     end
+end
 
+local function init_ball()
+    -- create ball
     world:new{
         pos = {x = 0, y = 0},
         g_circle = {radius = 10},
@@ -104,7 +107,10 @@ local function init_tiles()
         g_fill = true,
         velocity = {x = 20, y = 20},
     }
+end
 
+local function init_player()
+    -- create player
     world:new{
         pos = { x =  12 * block_size.w, y = 25 * block_size.h },
         g_rect = { w = player_size.w, h = player_size.h },
@@ -113,10 +119,16 @@ local function init_tiles()
     }
 end
 
-function load()
+local function load_sprites()
     sprites[tut_tile_idx] = graphics.load_sprite("./assets/tut_tiles.png")
+end
+
+function load()
+    load_sprites()
 
     init_tiles()
+    init_ball()
+    init_player()
 end
 
 local function draw_system(dt)
